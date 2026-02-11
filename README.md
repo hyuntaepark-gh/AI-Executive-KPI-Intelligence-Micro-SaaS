@@ -30,9 +30,7 @@ POST /ask
 ⬇️ Automatically performs:
 
 ```
-
 Natural Language → Metric Detection → SQL Builder → KPI Analysis → AI Narrative
-
 ```
 
 ---
@@ -40,7 +38,6 @@ Natural Language → Metric Detection → SQL Builder → KPI Analysis → AI Na
 # 🏗️ Architecture
 
 ```
-
 User Question (/ask)
 ↓
 AI Parser (Metric + Range Detection)
@@ -54,7 +51,6 @@ PostgreSQL KPI Warehouse
 LLM Insight Generator
 ↓
 API Response + History Logging
-
 ```
 
 ---
@@ -106,12 +102,10 @@ Returns supported:
 Example:
 
 ```
-
 {
 "metrics": ["revenue","orders","customers","aov"],
 "ranges": ["last_2_months","last_3_months","last_6_months","ytd"]
 }
-
 ```
 
 
@@ -153,6 +147,7 @@ Returns:
 Direct metric analysis.
 
 Example:
+
 ```
 {
 "metric": "revenue",
@@ -203,6 +198,7 @@ Returns past analyses with:
 ---
 
 # 🐳 Run with Docker
+
 ```
 docker compose up --build
 ```
@@ -217,6 +213,7 @@ http://localhost:8000/docs
 ---
 
 # 📂 Project Structure
+
 ```
 api/
 ├── app/
