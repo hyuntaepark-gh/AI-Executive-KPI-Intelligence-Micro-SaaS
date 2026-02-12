@@ -1,5 +1,11 @@
 # 🚀 AI Executive KPI Intelligence Micro-SaaS
 
+![FastAPI](https://img.shields.io/badge/FastAPI-API-green)
+![Docker](https://img.shields.io/badge/Docker-Container-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-316192)
+![AI Agent](https://img.shields.io/badge/AI-Agent-purple)
+![Decision Engine](https://img.shields.io/badge/Decision-Intelligence-orange)
+
 > Ask questions like **"Why did performance drop?"** and receive automated driver analysis, risk signals, and executive-ready AI insights.
 
 An AI-powered analytics backend that transforms natural language questions into KPI analysis, business drivers, and decision intelligence.
@@ -36,7 +42,9 @@ User Question
 → Executive Report
 ```
 
-# 🧠 Project Overview
+---
+
+## 🧠 Project Overview
 
 Traditional BI tools require manual exploration.
 
@@ -115,24 +123,21 @@ Final Executive Response
 
 ---
 
+## ⚙️ Tech Stack
 
----
-
-# ⚙️ Tech Stack
-
-## Backend
+### Backend
 
 - FastAPI
 - Python
 - Pydantic
 
-## Data Layer
+### Data Layer
 
 - PostgreSQL
 - Psycopg2
 - Dynamic SQL Builder
 
-## AI / Decision Intelligence
+### AI / Decision Intelligence
 
 - Agent Intelligence Engine
 - Driver Decomposition Service
@@ -140,35 +145,25 @@ Final Executive Response
 - Executive Report Formatter
 - LLM Planning Layer
 
-## Infra
+### Infra
 
 - Docker
 - Docker Compose
 
 ---
 
-# 🔌 API Endpoints
+## 🔌 API Endpoints
 
-## Base
+### Base
 
 - `GET /`
 - `GET /health`
 
----
+### Discovery
 
-## Discovery
+`GET /meta`
 
-### `GET /meta`
-
-Returns supported:
-
-- metrics
-- ranges
-- styles
-
----
-
-## KPI Management
+### KPI Management
 
 - `GET /kpi`
 - `POST /kpi`
@@ -180,14 +175,6 @@ Returns supported:
 ### `POST /ask` ⭐ (Primary Entry Point)
 
 Natural language → AI executive analysis.
-
-Example:
-
-```
-{
-"question": "Why did performance drop?"
-}
-```
 
 Returns:
 
@@ -206,28 +193,38 @@ Direct KPI metric analysis.
 
 ## 📊 Reports
 
-### `GET /report/monthly`
-
-Rule-based KPI comparison.
-
-### `POST /report/monthly-ai`
-
-LLM-generated executive summary.
+- `GET /report/monthly`
+- `POST /report/monthly-ai`
 
 ---
 
 ## 🧾 SaaS History Feature
 
-### `GET /history`
+`GET /history`
 
-Stores past AI analyses:
+Stores past AI analyses including SQL, narrative, risk, and recommendations.
 
-- metric
-- SQL
-- narrative
-- risk
-- recommendation
-- timestamp
+---
+
+## 🎬 Demo Flow
+
+```
+Insert KPI Data
+→ Ask Business Question
+→ AI Agent Analysis
+→ Driver Detection
+→ Risk Signal Generation
+→ Executive Report Response
+```
+
+Example question:
+
+```
+POST /ask
+{
+"question": "Why did performance drop?"
+}
+```
 
 ---
 
@@ -291,7 +288,7 @@ http://localhost:8000/docs
 
 ---
 
-# 🎯 Why This Project Matters
+## 🎯 Why This Project Matters
 
 Modern analytics platforms are evolving into **decision intelligence systems**.
 
@@ -303,14 +300,11 @@ This project demonstrates:
 - Risk signal generation
 - API-first AI SaaS architecture
 
-It reflects how real companies build internal AI decision engines
-on top of data warehouses.
-
 ---
 
-# 🧩 Real-World Inspiration
+## 🧩 Real-World Inspiration
 
-Inspired by modern:
+Inspired by:
 
 - AI Analytics Platforms
 - Executive BI Automation
@@ -318,7 +312,7 @@ Inspired by modern:
 
 ---
 
-# 🚀 Future Extensions
+## 🚀 Future Extensions
 
 - Auto SQL generation from natural language
 - Risk visual signals for frontend dashboards
@@ -328,7 +322,7 @@ Inspired by modern:
 
 ---
 
-# 📂 Project Structure
+## 📂 Project Structure
 
 ```
 api/
