@@ -264,29 +264,6 @@ Swagger UI:
 http://localhost:8000/docs
 ```
 
-
----
-
-# 📂 Project Structure
-
-```
-api/
-├── app/
-│ ├── services/
-│ │ ├── agent_intelligence.py
-│ │ ├── decision_service.py
-│ │ ├── driver_service.py
-│ │ ├── report_formatter.py
-│ │ └── analyze_service.py
-│ ├── schemas.py
-│ └── db.py
-├── llm/
-├── routers/
-│ ├── kpi.py
-│ └── demo.py
-└── main.py
-```
-
 ---
 
 # 🎯 Why This Project Matters
@@ -323,3 +300,25 @@ Inspired by modern:
 - KPI anomaly detection
 - Streaming KPI ingestion
 - Frontend AI dashboard
+
+---
+
+# 📂 Project Structure
+
+```
+api/
+├── app/
+│ ├── services/
+│ │ ├── agent_intelligence.py
+│ │ ├── decision_service.py
+│ │ ├── driver_service.py
+│ │ ├── report_formatter.py
+│ │ └── analyze_service.py
+│ ├── schemas.py
+│ └── db.py
+├── llm/
+├── routers/
+│ ├── kpi.py
+│ └── demo.py
+└── main.py
+```
