@@ -1,19 +1,6 @@
 version: "3.9"
 
 services:
-  api:
-    container_name: micro_saas_api
-    build:
-      context: .
-      dockerfile: api/Dockerfile
-    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
-    ports:
-      - "8000:8000"
-    volumes:
-      - .:/app
-    depends_on:
-      - postgres
-
   postgres:
     container_name: micro_postgres
     image: postgres:16
@@ -24,4 +11,21 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  api:
+    container_name: micro_saas_api
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - OPENAI_API_KEY: ${OPENAI_API_KEY}
+      - OPENAI_MODEL=gpt-4.1-mini
+      - DATABASE_URL=postgresql+psycopg2://admin:admin123@postgres:5432/analytics
+    depends_on:
+      - postgres

@@ -96,3 +96,61 @@ def build_narrative(metric: str, rows: list[dict], style: str = "executive"):
         narrative = f"{headline} Focus on the dominant driver and monitor downside risks."
 
     return (narrative, risk, recommendation)
+
+from openai import OpenAI
+import os
+from typing import Tuple
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+def build_llm_narrative(metric: str, rows: list[dict], style: str = "executive") -> Tuple[str, str, str]:
+    """
+    LLM-powered narrative.
+    Returns (narrative, risk, recommendation).
+    Falls back to rule-based build_narrative() if LLM fails or API key missing.
+    """
+    if not rows:
+        return ("No data found.", "No risk signals.", "Insert KPI data first.")
+
+    if not os.getenv("OPENAI_API_KEY"):
+        return build_narrative(metric, rows, style=style)
+
+    try:
+        prompt = f"""
+You are a senior analytics consultant. Write in {style} tone.
+
+Metric: {metric}
+Data (monthly rows, oldest -> newest):
+{rows}
+
+Return EXACTLY in this format:
+INSIGHT: <one paragraph>
+RISK: <one paragraph>
+RECOMMENDATION: <one paragraph>
+""".strip()
+
+        resp = client.chat.completions.create(
+            model="gpt-4.1-mini",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.3,
+        )
+
+        text = resp.choices[0].message.content.strip()
+
+        def _pick(prefix: str) -> str:
+            for line in text.splitlines():
+                if line.upper().startswith(prefix):
+                    return line.split(":", 1)[1].strip()
+            return ""
+
+        insight = _pick("INSIGHT")
+        risk = _pick("RISK")
+        rec = _pick("RECOMMENDATION")
+
+        if not insight or not risk or not rec:
+            return build_narrative(metric, rows, style=style)
+
+        return (insight, risk, rec)
+
+    except Exception:
+        return build_narrative(metric, rows, style=style)

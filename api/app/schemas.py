@@ -22,3 +22,24 @@ class AnalyzeResponse(BaseModel):
     narrative: str
     risk: str
     recommendation: str
+
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel
+
+class MonthlyAIReportResponse(BaseModel):
+    months: List[Dict[str, Any]]
+    summary: str
+    risks: List[str]
+    recommendations: List[str]
+
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, Field
+
+class AskRequest(BaseModel):
+    question: str = Field(..., example="Why did revenue drop recently?")
+    style: Optional[str] = Field(default="executive", example="executive")
+
+class AskResponse(BaseModel):
+    question: str
+    parsed: Dict[str, Any]  # {"metric":..., "range":..., "style":...}
+    result: AnalyzeResponse
