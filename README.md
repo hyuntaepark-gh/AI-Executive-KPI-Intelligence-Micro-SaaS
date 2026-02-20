@@ -96,35 +96,23 @@ Executive Report Formatter
 
 ---
 
----
-
 # 🖼️ Product Demo Screenshots
 
 ## 🚀 API Swagger Overview
-FastAPI Product API running via Docker Compose.
 
-![Swagger Overview](/screenshots/swagger-overview.png)
+![Swagger](screenshots/Micro-SaaS%20KPI%20Analytics%20API%20(FastAPI%20%2B%20Docker).png)
 
 ---
 
 ## 🧠 Executive Insight Endpoint
-Example KPI driver analysis request through the Decision Intelligence Engine.
 
-![Executive Insight](/screenshots/executive-insight.png)
-
----
-
-## 🐳 Docker Runtime (Production-style Containerization)
-Micro-SaaS API and PostgreSQL running in isolated containers.
-
-![Docker Running](/screenshots/docker-running.png)
+![Executive Insight](screenshots/Executive%20Insight%20Endpoint.png)
 
 ---
 
-## ⚙️ Docker Compose Architecture
-Service orchestration for API + KPI Warehouse.
+## 🐳 Docker Runtime
 
-![Docker Compose](/screenshots/docker-compose.png)
+![Docker Running](screenshots/Docker%20ps%20screen.png)
 
 ---
 
