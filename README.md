@@ -401,37 +401,36 @@ curl -X POST "http://localhost:8000/v1/agent/simulate" \
 
 ## 🗺️ Data Model (ERD)
 
-```
-# 🗺️ Data Model (ERD)
+```md
+## 🗺️ Data Model (ERD)
 
 ![ERD](docs/erd.png)
 
-Core analytical tables:
+### Core Tables
 
-- **mart_kpi_monthly**
-  - month (PK)
-  - revenue
-  - orders
-  - customers
-  - aov
+**mart_kpi_monthly**
+- month (PK)
+- revenue
+- orders
+- customers
+- aov
 
-- **fact_orders**
-  - order_id (PK)
-  - order_date
-  - customer_id
-  - product_id
-  - revenue
+**fact_orders**
+- order_id (PK)
+- order_date
+- customer_id
+- product_id
+- revenue
 
-- **dim_customer**
-  - customer_id (PK)
-  - country
-  - segment
+**dim_customer**
+- customer_id (PK)
+- country
+- segment
 
-- **dim_product**
-  - product_id (PK)
-  - category
-  - price
-```
+**dim_product**
+- product_id (PK)
+- category
+- price
 
 ---
 
