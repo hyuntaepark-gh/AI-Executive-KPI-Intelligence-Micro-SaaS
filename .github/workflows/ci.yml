@@ -35,24 +35,18 @@ jobs:
       - name: Prepare SQLite database
         run: |
           python - <<'PY'
-          import os
           import sqlite3
 
-          db_url = os.getenv("DATABASE_URL", "sqlite:///./test.db")
-          db_path = db_url.replace("sqlite:///", "", 1)
-
+          db_path = "test.db"
           conn = sqlite3.connect(db_path)
           cur = conn.cursor()
 
-          init_sql_path = "db/init.sql"
-          if os.path.exists(init_sql_path):
-              with open(init_sql_path, "r", encoding="utf-8") as f:
-                  sql = f.read()
-              cur.executescript(sql)
+          with open("db/init_test_sqlite.sql", "r", encoding="utf-8") as f:
+              cur.executescript(f.read())
 
           conn.commit()
           conn.close()
-          print("SQLite database initialized.")
+          print("SQLite test database initialized.")
           PY
 
       - name: Run tests
