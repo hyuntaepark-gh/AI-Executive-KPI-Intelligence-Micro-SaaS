@@ -434,16 +434,15 @@ curl -X POST "http://localhost:8000/v1/agent/simulate" \
 # 📂 Project Structure
 
 ```
-api/
-├── app/
-│ ├── services/
-│ ├── security/
-│ ├── utils/
-│ └── schemas.py
-├── routers/
-│ ├── ask_text.py
-│ ├── jobs.py
-│ ├── dashboard.py
-│ └── meta.py
-└── main.py
+AI-Executive-KPI-Intelligence-Micro-SaaS/
+├── .github/workflows/   # CI/CD workflows
+├── api/                 # FastAPI app and backend logic
+├── db/                  # Database scripts and initialization files
+├── docs/                # ERD, architecture diagrams, and project docs
+├── screenshots/         # Project screenshots for README/demo
+├── tests/               # Test cases
+├── .gitignore
+├── README.md
+├── docker-compose.yml   # Multi-container local setup
+└── requirements.txt     # Python dependencies
 ```
