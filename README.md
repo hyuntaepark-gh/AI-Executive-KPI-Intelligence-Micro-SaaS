@@ -10,7 +10,7 @@
 ![Executive AI](https://img.shields.io/badge/Executive-AI%20Analytics-FF6F00)
 ![AI SaaS](https://img.shields.io/badge/AI-SaaS%20Architecture-232F3E)
 ![Driver Analysis](https://img.shields.io/badge/KPI-Driver%20Decomposition-00897B)
-![CI](https://github.com/<YOUR_GITHUB_ID>/<REPO_NAME>/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/hyuntaepark-gh/AI-Executive-KPI-Intelligence-Micro-SaaS/actions/workflows/ci.yml/badge.svg)
 
 > Built as a **Product-Grade AI Analytics Backend** demonstrating  
 > Data Engineering, Backend Architecture, and Decision Intelligence design.
