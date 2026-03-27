@@ -439,7 +439,6 @@ AI-Executive-KPI-Intelligence-Micro-SaaS/
 ├── api/                 # FastAPI app and backend logic
 ├── db/                  # Database scripts and initialization files
 ├── docs/                # ERD, architecture diagrams, and project docs
-├── screenshots/         # Project screenshots for README/demo
 ├── tests/               # Test cases
 ├── .gitignore
 ├── README.md
