@@ -32,6 +32,29 @@ jobs:
           pip install -r requirements.txt
           pip install pytest httpx
 
+      - name: Prepare SQLite database
+        run: |
+          python - <<'PY'
+          import os
+          import sqlite3
+
+          db_url = os.getenv("DATABASE_URL", "sqlite:///./test.db")
+          db_path = db_url.replace("sqlite:///", "", 1)
+
+          conn = sqlite3.connect(db_path)
+          cur = conn.cursor()
+
+          init_sql_path = "db/init.sql"
+          if os.path.exists(init_sql_path):
+              with open(init_sql_path, "r", encoding="utf-8") as f:
+                  sql = f.read()
+              cur.executescript(sql)
+
+          conn.commit()
+          conn.close()
+          print("SQLite database initialized.")
+          PY
+
       - name: Run tests
         run: |
           pytest -q
