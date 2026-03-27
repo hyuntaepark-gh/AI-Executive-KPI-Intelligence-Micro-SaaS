@@ -335,6 +335,106 @@ This project demonstrates:
 BI Dashboard → AI Analytics Engine → Decision Intelligence SaaS
 ```
 
+---
+
+# 🔎 API Examples
+
+### Example 1) Executive KPI Explanation
+
+**Request**
+
+```
+curl -X POST "http://localhost:8000/v1/ask-executive" \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: test" \
+  -d '{
+    "question": "Why did revenue drop last month?"
+  }'
+```
+
+**Response**
+
+```
+{
+  "answer": "Revenue declined primarily due to fewer orders, while average order value remained relatively stable.",
+  "driver_summary": {
+    "primary_driver": "orders"
+  }
+}
+```
+### Example 2) What-If Simulation
+
+**Request**
+
+```
+curl -X POST "http://localhost:8000/v1/agent/simulate" \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: test" \
+  -d '{
+    "orders_delta_pct": 0.10
+  }'
+```
+
+**Response**
+
+```
+{
+  "baseline": {
+    "orders": 12400,
+    "aov": 58.2,
+    "revenue": 721680
+  },
+  "scenario": {
+    "orders": 13640,
+    "aov": 58.2,
+    "revenue": 794848
+  },
+  "delta": {
+    "orders": 1240,
+    "revenue": 73168
+  }
+}
+```
+
+
+---
+
+## 🗺️ Data Model (ERD)
+
+```
+# 🗺️ Data Model (ERD)
+
+![ERD](docs/erd.png)
+
+Core analytical tables:
+
+- **mart_kpi_monthly**
+  - month (PK)
+  - revenue
+  - orders
+  - customers
+  - aov
+
+- **fact_orders**
+  - order_id (PK)
+  - order_date
+  - customer_id
+  - product_id
+  - revenue
+
+- **dim_customer**
+  - customer_id (PK)
+  - country
+  - segment
+
+- **dim_product**
+  - product_id (PK)
+  - category
+  - price
+```
+
+---
+
 # 📂 Project Structure
 
 ```
