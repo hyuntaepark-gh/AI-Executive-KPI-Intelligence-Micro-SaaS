@@ -44,10 +44,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest httpx
+          pip install pytest httpx psycopg2-binary
 
       - name: Wait for DB
-        run: sleep 5
+        run: |
+          sleep 5
+
+      - name: Prepare database
+        run: |
           python - <<'PY'
           import os
           import psycopg2
