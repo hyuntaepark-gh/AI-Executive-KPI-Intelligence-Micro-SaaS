@@ -401,9 +401,6 @@ curl -X POST "http://localhost:8000/v1/agent/simulate" \
 
 ## 🗺️ Data Model (ERD)
 
-```md
-## 🗺️ Data Model (ERD)
-
 ![ERD](docs/erd.png)
 
 ### Core Tables
