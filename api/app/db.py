@@ -1,15 +1,15 @@
 import os
-import psycopg2
-from psycopg2.extras import RealDictCursor
+from urllib.parse import urlparse
 
-DB_CFG = dict(
-    host=os.getenv("DB_HOST", "postgres"),
-    database=os.getenv("DB_NAME", "analytics"),
-    user=os.getenv("DB_USER", "admin"),
-    password=os.getenv("DB_PASSWORD", "admin123"),
-)
+def get_conn():
+    database_url = os.getenv("DATABASE_URL")
 
-def get_conn(dict_cursor: bool = False):
-    if dict_cursor:
-        return psycopg2.connect(**DB_CFG, cursor_factory=RealDictCursor)
-    return psycopg2.connect(**DB_CFG)
+    # SQLite
+    if database_url.startswith("sqlite"):
+        import sqlite3
+        path = database_url.replace("sqlite:///", "")
+        return sqlite3.connect(path)
+
+    # Postgres
+    import psycopg2
+    return psycopg2.connect(database_url)
