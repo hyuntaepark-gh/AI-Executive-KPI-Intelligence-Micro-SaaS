@@ -10,26 +10,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:15.5
-        env:
-          POSTGRES_DB: analytics
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: admin123
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd="pg_isready -U admin"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
-
     env:
       API_KEY: test
       OPENAI_API_KEY: dummy-key
       OPENAI_MODEL: gpt-4.1-mini
-      DATABASE_URL: postgresql+psycopg2://admin:admin123@localhost:5432/analytics
+      DATABASE_URL: sqlite:///./test.db
       PYTHONPATH: .
 
     steps:
@@ -45,37 +30,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest httpx psycopg2-binary
-
-      - name: Wait for DB
-        run: |
-          sleep 5
-
-      - name: Prepare database
-        run: |
-          python - <<'PY'
-          import os
-          import psycopg2
-
-          conn = psycopg2.connect(
-              host="localhost",
-              port=5432,
-              dbname="analytics",
-              user="admin",
-              password="admin123",
-          )
-          conn.autocommit = True
-          cur = conn.cursor()
-
-          init_sql_path = "db/init.sql"
-          if os.path.exists(init_sql_path):
-              with open(init_sql_path, "r", encoding="utf-8") as f:
-                  cur.execute(f.read())
-
-          cur.close()
-          conn.close()
-          print("Database initialized.")
-          PY
+          pip install pytest httpx
 
       - name: Run tests
         run: |
