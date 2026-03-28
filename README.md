@@ -291,6 +291,117 @@ POST /v1/agent/simulate
 
 ---
 
+# 🧪 Real API Execution Proof (End-to-End AI Pipeline)
+
+This section demonstrates **real execution of the AI analytics pipeline** using Swagger UI.
+
+It validates:
+
+- Full pipeline execution
+- Agent routing behavior
+- SQL-driven analytics
+- Executive-level output generation
+
+---
+
+## 🔍 Scenario 1: Revenue Trend by Country
+
+### 1️⃣ Debug Trace (Agent Routing)
+
+![Debug Trend](docs/agent_debug_trend_country.png)
+
+- Agent routing executed successfully
+- Mode: `agent_llm`
+- Pipeline initialized with correct intent
+
+---
+
+### 2️⃣ Agent Query (Structured Analytics Output)
+
+![Query Trend](docs/agent_query_trend_country.png)
+
+- Generated structured plan:
+  - intent: `trend`
+  - metric: `revenue`
+  - breakdown: `country`
+- Returned time-series KPI data
+
+---
+
+### 3️⃣ Executive Report (Final AI Output)
+
+![Executive Trend](docs/executive_report_trend_country.png)
+
+- CFO-style narrative generated automatically
+- Key insights:
+  - US highest revenue contributor
+  - Germany/Canada variability
+  - Korea/Japan stable trends
+- Actionable recommendations included
+
+---
+
+## 🔎 Scenario 2: Revenue Drop Analysis
+
+### 1️⃣ Debug Trace (Fallback + Decision Logic)
+
+![Debug Drop](docs/agent_debug_revenue_drop.png)
+
+- Initial agent parsing failed
+- Fallback triggered: `multi_metric_fallback`
+- Decision engine handled ambiguity correctly
+
+---
+
+### 2️⃣ Agent Query (Comparative KPI Analysis)
+
+![Query Drop](docs/agent_query_revenue_drop.png)
+
+- Intent: `explain`
+- Comparison: `previous_period`
+- Output:
+  - revenue decreased from 83,531 → 70,878
+
+---
+
+### 3️⃣ Executive Report (Final Business Insight)
+
+![Executive Drop](docs/executive_report_revenue_drop.png)
+
+- AI-generated executive summary:
+  - Significant revenue decline detected
+  - No detailed driver breakdown available
+- Recommended next steps:
+  - Segment-level analysis
+  - Pricing / marketing investigation
+
+---
+
+## 🧠 What This Proves
+
+This is **not a toy LLM demo**.
+
+It demonstrates a **production-style AI analytics system**:
+
+✔ Natural Language → KPI Intent Detection  
+✔ Dynamic Query Planning  
+✔ SQL-based Data Retrieval  
+✔ Driver / Trend Analysis  
+✔ Decision Engine Fallback Logic  
+✔ Executive Narrative Generation  
+
+---
+
+## 🏆 Key Technical Validation
+
+- Multi-stage AI pipeline execution
+- Deterministic + LLM hybrid system
+- Failure recovery (fallback routing)
+- Real API responses (not mocked)
+- Production-ready architecture
+
+---
+
 # 🐳 Run with Docker
 
 ```
