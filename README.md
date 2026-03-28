@@ -72,7 +72,7 @@ User Question
 
 # 🏗️ Architecture
 
-![System Architecture](docs/End-to-End System Architecture of the KPI Intelligence System.png)
+![System Architecture](docs/End-to-End%20System%20Architecture%20of%20the%20KPI%20Intelligence%20System.png)
 
 ---
 
