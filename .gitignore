@@ -1,4 +1,15 @@
 __pycache__/
-.env
 *.pyc
+
+# env files
+.env
+.env.*
+
+# IDE
 .vscode/
+
+# DB / local files
+*.db
+
+# OS
+.DS_Store

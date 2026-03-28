@@ -1,7 +1,9 @@
 import time
+import traceback
 from typing import Optional
 
 from fastapi import APIRouter, Body, BackgroundTasks
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, Field, ConfigDict
 
 from api.app.schemas import AskRequest
@@ -25,7 +27,6 @@ from api.app.services.insight_service import (
     simulate_kpi_what_if,
 )
 
-# Async job store
 from api.app.services.job_store import (
     create_job,
     set_job_running,
@@ -36,9 +37,6 @@ from api.app.services.job_store import (
 router = APIRouter(tags=["agent"])
 
 
-# =========================
-# Request Models (Pydantic v2 style)
-# =========================
 class AgentQueryJSON(BaseModel):
     question: str
     model_config = ConfigDict(
@@ -59,31 +57,37 @@ class SimulationRequest(BaseModel):
     customers_delta_pct: float = Field(default=0.0, description="Informational only")
 
 
-# =========================
-# Internal helper: run agent with robust fallback
-# =========================
 def _run_agent_with_fallback(question: str) -> dict:
     """
     Tries OpenAI agent first; if quota/error happens, falls back to legacy KPI analysis.
     Always returns a consistent payload with mode + final_report.
     """
     q = (question or "").strip()
+    print("🔥 _run_agent_with_fallback CALLED")
+    print("question =", q)
 
-    # 1) Try LLM agent (may fail due to quota)
     try:
+        print("🔥 TRY ask_agent")
         res = ask_agent(q)
+        print("✅ ask_agent SUCCESS")
         return {"mode": "agent_llm", "result": res}
-    except Exception:
-        pass
+    except Exception as e:
+        print("🔥 ask_agent FAILED:", str(e))
+        traceback.print_exc()
 
-    # 2) Rule-based multi-metric fallback for generic "why/performance/drop"
     q_lower = q.lower()
     multi_keywords = ["performance", "business", "overall", "drop", "why"]
     if any(k in q_lower for k in multi_keywords):
+        print("🔥 USING multi_metric_fallback")
         metrics = ["revenue", "orders", "customers", "aov"]
         outputs = []
+
         for m in metrics:
-            legacy_payload = AskRequest(question=f"{m} last_3_months executive", style="executive")
+            print("fallback metric =", m)
+            legacy_payload = AskRequest(
+                question=f"{m} last_3_months executive",
+                style="executive",
+            )
             outputs.append(_ask_legacy_core(legacy_payload))
 
         driver_summary = build_driver_summary(outputs)
@@ -108,7 +112,7 @@ def _run_agent_with_fallback(question: str) -> dict:
             "results": outputs,
         }
 
-    # 3) Single-metric fallback by parsing question (legacy)
+    print("🔥 USING fallback_legacy")
     legacy_payload = AskRequest(question=q, style="executive")
     legacy = _ask_legacy_core(legacy_payload)
     final_report = build_final_report({"mode": "fallback_legacy", "legacy": legacy})
@@ -124,10 +128,17 @@ def _ask_legacy_core(payload: AskRequest) -> dict:
     """
     Core legacy path (no FastAPI response models) – returns plain dict.
     """
+    print("🔥 _ask_legacy_core CALLED")
+    print("legacy question =", payload.question)
+
     parsed = parse_question(payload.question, style=payload.style)
+    print("parsed =", parsed)
 
     sql = build_metric_sql(metric=parsed["metric"], range_=parsed["range"])
+    print("legacy sql =", sql)
+
     rows = fetch_metric_rows(sql)
+    print("legacy rows count =", len(rows) if hasattr(rows, "__len__") else "unknown")
 
     try:
         narrative, risk, recommendation = build_llm_narrative(
@@ -135,12 +146,16 @@ def _ask_legacy_core(payload: AskRequest) -> dict:
             rows,
             style=parsed["style"],
         )
-    except Exception:
+        print("✅ build_llm_narrative SUCCESS")
+    except Exception as e:
+        print("🔥 build_llm_narrative FAILED:", str(e))
+        traceback.print_exc()
         narrative, risk, recommendation = build_narrative(
             parsed["metric"],
             rows,
             style=parsed["style"],
         )
+        print("✅ build_narrative fallback SUCCESS")
 
     return {
         "question": payload.question,
@@ -158,9 +173,6 @@ def _ask_legacy_core(payload: AskRequest) -> dict:
     }
 
 
-# =========================
-#  Product-grade debug trace (no chain-of-thought)
-# =========================
 def _build_debug_trace(question: str) -> dict:
     """
     Product-grade debug trace.
@@ -174,7 +186,6 @@ def _build_debug_trace(question: str) -> dict:
         "mode": None,
     }
 
-    # 1) Try LLM agent
     try:
         t0 = time.time()
         res = ask_agent(q)
@@ -193,7 +204,6 @@ def _build_debug_trace(question: str) -> dict:
     except Exception as e:
         trace["steps"].append({"name": "ask_agent", "status": "failed", "error": str(e)[:200]})
 
-    # 2) Decide fallback
     q_lower = q.lower()
     multi_keywords = ["performance", "business", "overall", "drop", "why"]
     if any(k in q_lower for k in multi_keywords):
@@ -206,33 +216,23 @@ def _build_debug_trace(question: str) -> dict:
     return trace
 
 
-# =========================
-#  Async job runner
-# =========================
 def _run_job(job_id: str, question: str):
     try:
         set_job_running(job_id)
         result = _run_agent_with_fallback(question)
-        set_job_result(job_id, result)
+        set_job_result(job_id, jsonable_encoder(result))
     except Exception as e:
         set_job_error(job_id, str(e))
 
 
-# =========================
-# v1 Endpoints
-# =========================
 @router.post("/ask-text", summary="Ask (text/plain)")
 def ask_text(question: str = Body(..., media_type="text/plain")):
-    """
-    Text/plain convenience endpoint.
-    """
     request_id = new_request_id()
     t0 = time.time()
 
     payload = _run_agent_with_fallback(question)
     latency_ms = int((time.time() - t0) * 1000)
 
-    # best-effort agent logging
     try:
         insert_agent_log(
             {
@@ -247,7 +247,7 @@ def ask_text(question: str = Body(..., media_type="text/plain")):
         pass
 
     payload.update({"request_id": request_id, "latency_ms": latency_ms})
-    return payload
+    return jsonable_encoder(payload)
 
 
 @router.post("/agent/query", summary="Agent Query (JSON)")
@@ -272,10 +272,9 @@ def agent_query(payload: AgentQueryJSON):
         pass
 
     result.update({"request_id": request_id, "latency_ms": latency_ms})
-    return result
+    return jsonable_encoder(result)
 
 
-# /v1/agent/query-async
 @router.post("/agent/query-async", summary="Agent Query Async (returns job_id)")
 def agent_query_async(payload: AgentQueryJSON, background_tasks: BackgroundTasks):
     job = create_job({"type": "agent_query", "input": {"question": payload.question}})
@@ -283,11 +282,13 @@ def agent_query_async(payload: AgentQueryJSON, background_tasks: BackgroundTasks
 
     background_tasks.add_task(_run_job, job_id, payload.question)
 
-    return {
-        "status": "accepted",
-        "job_id": job_id,
-        "poll": f"/v1/jobs/{job_id}",
-    }
+    return jsonable_encoder(
+        {
+            "status": "accepted",
+            "job_id": job_id,
+            "poll": f"/v1/jobs/{job_id}",
+        }
+    )
 
 
 @router.post("/ask-executive", summary="Executive Report Only")
@@ -295,15 +296,28 @@ def ask_executive(payload: AgentQueryJSON):
     """
     Returns ONLY the executive final_report string (clean CFO-style output).
     """
+    print("🔥 ask_executive ROUTE CALLED")
+    print("question =", payload.question)
+
     request_id = new_request_id()
     t0 = time.time()
 
-    full = _run_agent_with_fallback(payload.question)
+    try:
+        full = _run_agent_with_fallback(payload.question)
+        print("full keys =", list(full.keys()) if isinstance(full, dict) else type(full).__name__)
+    except Exception as e:
+        print("🔥 ask_executive ERROR:", str(e))
+        traceback.print_exc()
+        raise
+
     latency_ms = int((time.time() - t0) * 1000)
 
     final_report = full.get("final_report")
     if final_report is None:
-        final_report = full.get("result")
+        if isinstance(full.get("result"), dict):
+            final_report = full["result"].get("report")
+        else:
+            final_report = full.get("result")
 
     try:
         insert_agent_log(
@@ -318,20 +332,21 @@ def ask_executive(payload: AgentQueryJSON):
     except Exception:
         pass
 
-    return {
-        "request_id": request_id,
-        "mode": full.get("mode"),
-        "latency_ms": latency_ms,
-        "final_report": final_report,
-    }
+    return jsonable_encoder(
+        {
+            "request_id": request_id,
+            "mode": full.get("mode"),
+            "latency_ms": latency_ms,
+            "final_report": final_report,
+        }
+    )
 
 
 @router.get("/agent/history", summary="Agent Query History")
 def agent_history(limit: int = 20):
-    return {"data": fetch_agent_history(limit=limit)}
+    return jsonable_encoder({"data": fetch_agent_history(limit=limit)})
 
 
-# /v1/agent/debug
 @router.post("/agent/debug", summary="Debug trace (no chain-of-thought)")
 def agent_debug(payload: AgentQueryJSON):
     request_id = new_request_id()
@@ -340,24 +355,20 @@ def agent_debug(payload: AgentQueryJSON):
     trace = _build_debug_trace(payload.question)
     latency_ms = int((time.time() - t0) * 1000)
 
-    return {
-        "request_id": request_id,
-        "latency_ms": latency_ms,
-        "trace": trace,
-    }
+    return jsonable_encoder(
+        {
+            "request_id": request_id,
+            "latency_ms": latency_ms,
+            "trace": trace,
+        }
+    )
 
 
-# =========================
-# Product-grade endpoints
-# =========================
 @router.get("/agent/explain", summary="Driver breakdown only (no LLM)")
 def agent_explain():
-    """
-    Rule-based driver explanation using latest 2 months (no OpenAI calls).
-    """
     changes = compute_latest_kpi_changes()
     if changes.get("status") != "ok":
-        return changes
+        return jsonable_encoder(changes)
 
     months = changes["months"]
     base, target = months[0], months[1]
@@ -365,48 +376,43 @@ def agent_explain():
     def pct(prev, cur):
         return (cur - prev) / prev if (prev is not None and cur is not None and prev != 0) else None
 
-    return {
-        "status": "ok",
-        "previous_month": base.get("month"),
-        "current_month": target.get("month"),
-        "revenue": {
-            "previous": base.get("revenue"),
-            "current": target.get("revenue"),
-            "pct_change": pct(base.get("revenue"), target.get("revenue")),
-        },
-        "orders": {
-            "previous": base.get("orders"),
-            "current": target.get("orders"),
-            "pct_change": pct(base.get("orders"), target.get("orders")),
-        },
-        "aov": {
-            "previous": base.get("aov"),
-            "current": target.get("aov"),
-            "pct_change": pct(base.get("aov"), target.get("aov")),
-        },
-        "note": "Revenue change is primarily explained by Orders and AOV. Use /v1/ask-executive for formatted executive output.",
-    }
+    return jsonable_encoder(
+        {
+            "status": "ok",
+            "previous_month": base.get("month"),
+            "current_month": target.get("month"),
+            "revenue": {
+                "previous": base.get("revenue"),
+                "current": target.get("revenue"),
+                "pct_change": pct(base.get("revenue"), target.get("revenue")),
+            },
+            "orders": {
+                "previous": base.get("orders"),
+                "current": target.get("orders"),
+                "pct_change": pct(base.get("orders"), target.get("orders")),
+            },
+            "aov": {
+                "previous": base.get("aov"),
+                "current": target.get("aov"),
+                "pct_change": pct(base.get("aov"), target.get("aov")),
+            },
+            "note": "Revenue change is primarily explained by Orders and AOV. Use /v1/ask-executive for formatted executive output.",
+        }
+    )
 
 
 @router.post("/agent/insight", summary="Auto anomaly detection on latest KPI changes")
 def agent_insight(payload: InsightRequest):
-    """
-    Detect KPI anomalies on latest 2 months (rule-based thresholds).
-    """
     changes = compute_latest_kpi_changes()
-    return detect_anomalies(changes, thresholds=payload.thresholds)
+    return jsonable_encoder(detect_anomalies(changes, thresholds=payload.thresholds))
 
 
 @router.post("/agent/simulate", summary="What-if simulation (Orders/AOV -> Revenue)")
 def agent_simulate(payload: SimulationRequest):
-    """
-    Quick what-if simulation:
-      Revenue ~ Orders * AOV
-    """
     changes = compute_latest_kpi_changes()
     scenario = {
         "orders_delta_pct": payload.orders_delta_pct,
         "aov_delta_pct": payload.aov_delta_pct,
         "customers_delta_pct": payload.customers_delta_pct,
     }
-    return simulate_kpi_what_if(changes, scenario)
+    return jsonable_encoder(simulate_kpi_what_if(changes, scenario))

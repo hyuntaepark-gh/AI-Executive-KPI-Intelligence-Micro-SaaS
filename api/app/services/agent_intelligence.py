@@ -1,7 +1,5 @@
 import os
-import json
 
-# pip install openai
 try:
     from openai import OpenAI
 except Exception:
@@ -25,28 +23,74 @@ Rules:
 FEWSHOTS = [
     {
         "q": "show revenue trend",
-        "a": "SELECT d, SUM(revenue) AS revenue FROM demo_sales_daily GROUP BY 1 ORDER BY 1"
+        "a": "SELECT d, SUM(revenue) AS revenue FROM demo_sales_daily GROUP BY 1 ORDER BY 1",
     },
     {
         "q": "show revenue trend by country",
-        "a": "SELECT d, country, SUM(revenue) AS revenue FROM demo_sales_daily GROUP BY 1,2 ORDER BY 1,2"
+        "a": "SELECT d, country, SUM(revenue) AS revenue FROM demo_sales_daily GROUP BY 1,2 ORDER BY 1,2",
     },
     {
         "q": "top 5 countries by revenue",
-        "a": "SELECT country, SUM(revenue) AS revenue FROM demo_sales_daily GROUP BY 1 ORDER BY 2 DESC LIMIT 5"
+        "a": "SELECT country, SUM(revenue) AS revenue FROM demo_sales_daily GROUP BY 1 ORDER BY 2 DESC LIMIT 5",
     },
 ]
 
 
 def _fallback_sql(question: str) -> str:
-    q = question.lower()
+    q = (question or "").lower().strip()
+
     if "trend" in q and "country" in q:
-        return "SELECT d, country, SUM(revenue) AS revenue FROM demo_sales_daily GROUP BY 1,2 ORDER BY 1,2"
+        return (
+            "SELECT d, country, SUM(revenue) AS revenue "
+            "FROM demo_sales_daily "
+            "GROUP BY 1,2 "
+            "ORDER BY 1,2"
+        )
+
     if "trend" in q:
-        return "SELECT d, SUM(revenue) AS revenue FROM demo_sales_daily GROUP BY 1 ORDER BY 1"
+        return (
+            "SELECT d, SUM(revenue) AS revenue "
+            "FROM demo_sales_daily "
+            "GROUP BY 1 "
+            "ORDER BY 1"
+        )
+
     if "top" in q and "country" in q:
-        return "SELECT country, SUM(revenue) AS revenue FROM demo_sales_daily GROUP BY 1 ORDER BY 2 DESC LIMIT 10"
-    return "SELECT d, country, revenue, orders, customers FROM demo_sales_daily ORDER BY d, country"
+        return (
+            "SELECT country, SUM(revenue) AS revenue "
+            "FROM demo_sales_daily "
+            "GROUP BY 1 "
+            "ORDER BY 2 DESC "
+            "LIMIT 10"
+        )
+
+    return (
+        "SELECT d, country, revenue, orders, customers "
+        "FROM demo_sales_daily "
+        "ORDER BY d, country"
+    )
+
+
+def _sanitize_sql(sql: str, question: str) -> str:
+    sql = (sql or "").strip()
+
+    if sql.startswith("```"):
+        sql = sql.strip("`")
+        if sql.lower().startswith("sql"):
+            sql = sql[3:].strip()
+
+    sql = sql.rstrip(";").strip()
+
+    if not sql:
+        return _fallback_sql(question)
+
+    if not sql.lower().startswith("select"):
+        return _fallback_sql(question)
+
+    if "demo_sales_daily" not in sql.lower():
+        return _fallback_sql(question)
+
+    return sql
 
 
 def build_sql_from_question(question: str) -> str:
@@ -62,7 +106,6 @@ def build_sql_from_question(question: str) -> str:
 
     client = OpenAI(api_key=api_key)
 
-    # few-shot messages
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
     for ex in FEWSHOTS:
         messages.append({"role": "user", "content": ex["q"]})
@@ -72,17 +115,13 @@ def build_sql_from_question(question: str) -> str:
 
     model = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
 
-    resp = client.chat.completions.create(
-        model=model,
-        messages=messages,
-        temperature=0.1,
-    )
-
-    sql = resp.choices[0].message.content.strip()
-
-    if sql.startswith("```"):
-        sql = sql.strip("`")
-        sql = sql.replace("sql", "", 1).strip()
-
-    sql = sql.strip().rstrip(";").strip()
-    return sql
+    try:
+        resp = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=0.1,
+        )
+        sql = resp.choices[0].message.content or ""
+        return _sanitize_sql(sql, question)
+    except Exception:
+        return _fallback_sql(question)

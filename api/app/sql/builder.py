@@ -3,8 +3,10 @@ from typing import Optional, List, Tuple, Dict, Any
 
 ALLOWED_BREAKDOWNS = {"category", "seller_id", "country"}
 
+
 def _parse_yyyy_mm_dd(s: str) -> date:
     return datetime.strptime(s, "%Y-%m-%d").date()
+
 
 def resolve_date_range(dr: Dict[str, Any]) -> Tuple[date, date]:
     mode = dr.get("mode")
@@ -29,12 +31,11 @@ def resolve_date_range(dr: Dict[str, Any]) -> Tuple[date, date]:
         return first_prev, first_this
     if preset == "yoy":
         return today - timedelta(days=365), today
-
-    # last_quarter (simple approximation: 90 days)
     if preset == "last_quarter":
         return today - timedelta(days=90), today
 
     return today - timedelta(days=30), today
+
 
 def build_kpi_sql(
     metric: str,
@@ -43,18 +44,17 @@ def build_kpi_sql(
     end: date,
     breakdown: Optional[List[str]] = None,
 ) -> Tuple[str, Dict[str, Any]]:
-
     metric_expr = {
-        "revenue": "SUM(net_revenue)",
-        "orders": "COUNT(DISTINCT order_id)",
-        "customers": "COUNT(DISTINCT customer_id)",
-        "aov": "SUM(net_revenue) / NULLIF(COUNT(DISTINCT order_id), 0)",
+        "revenue": "SUM(revenue)",
+        "orders": "SUM(orders)",
+        "customers": "SUM(customers)",
+        "aov": "SUM(revenue) / NULLIF(SUM(orders), 0)",
     }[metric]
 
     grain_expr = {
-        "day": "date_trunc('day', order_date)::date",
-        "week": "date_trunc('week', order_date)::date",
-        "month": "date_trunc('month', order_date)::date",
+        "day": "date_trunc('day', d)::date",
+        "week": "date_trunc('week', d)::date",
+        "month": "date_trunc('month', d)::date",
     }[grain]
 
     select_cols = [f"{grain_expr} AS period"]
@@ -71,11 +71,11 @@ def build_kpi_sql(
     SELECT
       {", ".join(select_cols)},
       {metric_expr} AS value
-    FROM analytics.sales_fact
-    WHERE order_date >= :start AND order_date < :end
+    FROM demo_sales_daily
+    WHERE d >= :start AND d < :end
     GROUP BY {", ".join(group_cols)}
     ORDER BY {", ".join(group_cols)};
     """.strip()
 
-    params = {"start": start, "end": end}
+    params = {"start": str(start), "end": str(end)}
     return sql, params
