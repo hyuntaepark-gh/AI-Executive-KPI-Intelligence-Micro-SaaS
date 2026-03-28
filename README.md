@@ -14,9 +14,23 @@
 
 > Built as a **Product-Grade AI Analytics Backend** demonstrating  
 > Data Engineering, Backend Architecture, and Decision Intelligence design.
-> Ask questions like **"Why did performance drop?"** and receive automated driver analysis, risk signals, anomaly detection, and executive-ready AI insights.
 
-An AI-powered analytics backend that transforms natural language questions into KPI analysis, business drivers, and decision intelligence using a **Micro-SaaS product architecture**.
+Ask questions like **"Why did performance drop?"** and receive automated driver analysis, risk signals, anomaly detection, and executive-ready AI insights.
+
+---
+
+# 🧨 What Makes This Different
+
+Unlike traditional BI dashboards or simple LLM demos, this system:
+
+- Combines deterministic data pipelines with LLM reasoning
+- Executes real SQL queries instead of hallucinated outputs
+- Implements fallback decision logic when AI parsing fails
+- Produces structured analytics BEFORE generating narratives
+- Simulates a production-grade AI analytics backend
+
+👉 This is not a chatbot.  
+👉 This is a **Decision Intelligence System**.
 
 ---
 
@@ -32,6 +46,15 @@ This system simulates a modern AI analytics product that automatically:
 - Detects KPI anomalies
 - Runs what-if simulations
 - Supports async AI jobs
+
+> ⚠️ Note:  
+This system does NOT rely purely on LLMs.
+
+- Core analytics are SQL-driven  
+- KPI computations are deterministic  
+- LLM is used only for interpretation and narrative generation  
+
+This ensures reliability and prevents hallucinated business insights.
 
 ---
 
@@ -66,6 +89,16 @@ Decision Signal Engine
 ↓
 Executive Report Formatter
 ```
+
+---
+
+## 🧱 System Design Highlights
+
+- Microservice-style API architecture
+- Separation of concerns (Agent / SQL / Decision Engine)
+- Stateless API layer for scalability
+- Pluggable LLM + rule-based hybrid system
+- Production-style fallback handling
 
 ---
 
@@ -121,6 +154,7 @@ Executive Report Formatter
 
 All production endpoints live under:
 
+
 ```
 /v1/*
 
@@ -132,7 +166,7 @@ Requires:
 X-API-Key
 ```
 
-Swagger → Authorize 버튼 사용.
+Swagger → Authorize button used
 
 ---
 
@@ -402,6 +436,25 @@ It demonstrates a **production-style AI analytics system**:
 
 ---
 
+# ⚡ Quick Start
+
+```
+git clone https://github.com/hyuntaepark-gh/AI-Executive-KPI-Intelligence-Micro-SaaS.git
+cd AI-Executive-KPI-Intelligence-Micro-SaaS
+
+docker compose up --build
+```
+Open:
+```
+http://localhost:8000/docs
+```
+
+1. Click "Authorize"
+2. Enter API Key: dev-secret-key
+3. Try /v1/ask-executive
+
+---
+
 # 🐳 Run with Docker
 
 ```
@@ -428,6 +481,21 @@ This project demonstrates:
 - Async AI job processing
 - Frontend-ready API design
 - Micro-SaaS backend system
+
+---
+
+💼 Example Use Cases
+Executive KPI monitoring
+Revenue anomaly detection
+Business performance diagnosis
+Decision support systems
+
+---
+
+📊 Performance
+API latency: ~400–600ms
+Query execution: <200ms
+Async job support for scalability
 
 ---
 
