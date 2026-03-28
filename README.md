@@ -154,11 +154,7 @@ Executive Report Formatter
 
 All production endpoints live under:
 
-
-```
-/v1/*
-
-```
+`/v1/*`
 
 Requires:
 
@@ -166,7 +162,7 @@ Requires:
 X-API-Key
 ```
 
-Swagger → Authorize button used
+Swagger → Use the **Authorize** button
 
 ---
 
@@ -296,32 +292,35 @@ POST /v1/seed-demo
 
 ## 2️⃣ Ask Executive AI
 
-```
 POST /v1/ask-executive
+
+Request Body:
+
 {
-"question": "Why did performance drop?"
+  "question": "Why did performance drop?"
 }
-```
 
 ---
 
 ## 3️⃣ Detect KPI Risk
 
-```
 POST /v1/agent/insight
+
+Request Body:
+
 {}
-```
 
 ---
 
 ## 4️⃣ Run What-If Simulation
 
-```
 POST /v1/agent/simulate
+
+Request Body:
+
 {
-"orders_delta_pct": 0.1
+  "orders_delta_pct": 0.1
 }
-```
 
 ---
 
@@ -438,20 +437,17 @@ It demonstrates a **production-style AI analytics system**:
 
 # ⚡ Quick Start
 
-```
-git clone https://github.com/hyuntaepark-gh/AI-Executive-KPI-Intelligence-Micro-SaaS.git
-cd AI-Executive-KPI-Intelligence-Micro-SaaS
+git clone https://github.com/hyuntaepark-gh/AI-Executive-KPI-Intelligence-Micro-SaaS.git  
+cd AI-Executive-KPI-Intelligence-Micro-SaaS  
 
-docker compose up --build
-```
-Open:
-```
-http://localhost:8000/docs
-```
+docker compose up --build  
 
-1. Click "Authorize"
-2. Enter API Key: dev-secret-key
-3. Try /v1/ask-executive
+Open:  
+http://localhost:8000/docs  
+
+1. Click "Authorize"  
+2. Enter API Key: dev-secret-key  
+3. Try /v1/ask-executive  
 
 ---
 
@@ -485,14 +481,16 @@ This project demonstrates:
 ---
 
 # 💼 Example Use Cases
-Executive KPI monitoring
-Revenue anomaly detection
-Business performance diagnosis
-Decision support systems
+
+- Executive KPI monitoring  
+- Revenue anomaly detection  
+- Business performance diagnosis  
+- Decision support systems  
 
 ---
 
 # 📊 Performance
+
 API latency: ~400–600ms
 Query execution: <200ms
 Async job support for scalability
