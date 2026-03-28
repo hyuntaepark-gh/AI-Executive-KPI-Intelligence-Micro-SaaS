@@ -605,5 +605,6 @@ AI-Executive-KPI-Intelligence-Micro-SaaS/
 ├── .gitignore           # Ignore secrets, cache files, and local environments
 ├── requirements.txt     # Python dependencies
 ├── docker-compose.yml   # Multi-container local setup
+├── research/           # Research papers, workshop submissions, and publications
 └── README.md
 ```
