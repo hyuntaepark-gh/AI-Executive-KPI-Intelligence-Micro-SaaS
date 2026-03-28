@@ -101,19 +101,19 @@ Executive Report Formatter
 
 ## 🚀 API Swagger Overview
 
-![Swagger](screenshots/Micro-SaaS%20KPI%20Analytics%20API%20(FastAPI%20%2B%20Docker).png)
+![Swagger](docs/Micro-SaaS%20KPI%20Analytics%20API%20(FastAPI%20%2B%20Docker).png)
 
 ---
 
 ## 🧠 Executive Insight Endpoint
 
-![Executive Insight](screenshots/Executive%20Insight%20Endpoint.png)
+![Executive Insight](docs/Executive%20Insight%20Endpoint.png)
 
 ---
 
 ## 🐳 Docker Runtime
 
-![Docker Running](screenshots/Docker%20ps%20screen.png)
+![Docker Running](docs/Docker%20ps%20screen.png)
 
 ---
 
