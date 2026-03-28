@@ -72,23 +72,7 @@ User Question
 
 # 🏗️ Architecture
 
-```
-Client
-↓
-FastAPI Product API (/v1/*)
-↓
-Agent Intelligence Router
-↓
-Dynamic SQL Builder
-↓
-PostgreSQL KPI Warehouse
-↓
-Driver Decomposition Engine
-↓
-Decision Signal Engine
-↓
-Executive Report Formatter
-```
+![System Architecture](docs/End-to-End System Architecture of the KPI Intelligence System.png)
 
 ---
 
