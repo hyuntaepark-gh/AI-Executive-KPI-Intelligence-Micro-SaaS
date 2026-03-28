@@ -491,9 +491,9 @@ This project demonstrates:
 
 # 📊 Performance
 
-API latency: ~400–600ms
-Query execution: <200ms
-Async job support for scalability
+- API latency: ~400–600ms  
+- Query execution: <200ms  
+- Async job support for scalability  
 
 ---
 
