@@ -601,8 +601,9 @@ AI-Executive-KPI-Intelligence-Micro-SaaS/
 ├── db/                  # Database scripts and initialization files
 ├── docs/                # ERD, architecture diagrams, and project docs
 ├── tests/               # Test cases
-├── .gitignore
-├── README.md
+├── .env.example         # Environment variables template (API keys, DB config)
+├── .gitignore           # Ignore secrets, cache files, and local environments
+├── requirements.txt     # Python dependencies
 ├── docker-compose.yml   # Multi-container local setup
-└── requirements.txt     # Python dependencies
+└── README.md
 ```
