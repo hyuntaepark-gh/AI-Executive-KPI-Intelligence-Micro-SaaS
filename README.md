@@ -484,7 +484,7 @@ This project demonstrates:
 
 ---
 
-💼 Example Use Cases
+# 💼 Example Use Cases
 Executive KPI monitoring
 Revenue anomaly detection
 Business performance diagnosis
@@ -492,7 +492,7 @@ Decision support systems
 
 ---
 
-📊 Performance
+# 📊 Performance
 API latency: ~400–600ms
 Query execution: <200ms
 Async job support for scalability
